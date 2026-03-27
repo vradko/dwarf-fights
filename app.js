@@ -2253,6 +2253,14 @@ function finishBattle(winner, now) {
   showVictoryOverlay(winner);
   playWinSound();
 
+  // Initial beer cap celebration burst
+  for (let i = 0; i < 5; i++) {
+    setTimeout(() => {
+      spawnBottleCaps(randomRange(100, 900), WORLD_HEIGHT + 10, randomInt(5, 10));
+      playBeerOpenSound();
+    }, i * 200);
+  }
+
   updateArenaText(
     "Last dwarf standing",
     `${winner.personName} survived the octagon`,
@@ -2452,6 +2460,44 @@ function drawParticlesPixi(gfx, layer) {
       const hw = particle.size * 0.3;
       gfx.drawRect(px - hs, py - hw, particle.size, particle.size * 0.6);
       gfx.endFill();
+    } else if (particle.kind === "bottlecap") {
+      // Beer bottle cap - circle with ridged edges and star/text
+      const capRatio = Math.min(1, ratio * 1.5); // stay visible longer
+      const capAlpha = capRatio * 0.95;
+      const capSize = particle.size;
+      const rot = particle.rotation || 0;
+
+      // Cap body (colored circle)
+      const capColor = particle.capColor || 0xd4a017;
+      gfx.beginFill(capColor, capAlpha);
+      gfx.drawCircle(px, py, capSize);
+      gfx.endFill();
+
+      // Cap ridged edge (darker ring)
+      gfx.lineStyle(1.5, 0x000000, capAlpha * 0.4);
+      gfx.drawCircle(px, py, capSize);
+      gfx.lineStyle(0);
+
+      // Inner ring
+      gfx.lineStyle(0.8, 0xffffff, capAlpha * 0.3);
+      gfx.drawCircle(px, py, capSize * 0.65);
+      gfx.lineStyle(0);
+
+      // Center dot
+      gfx.beginFill(0xffffff, capAlpha * 0.25);
+      gfx.drawCircle(px, py, capSize * 0.2);
+      gfx.endFill();
+
+      // Ridges around edge (small notches)
+      const ridgeCount = 12;
+      for (let r = 0; r < ridgeCount; r++) {
+        const rAngle = rot + (Math.PI * 2 * r) / ridgeCount;
+        const rx = px + Math.cos(rAngle) * capSize;
+        const ry = py + Math.sin(rAngle) * capSize;
+        gfx.beginFill(0x000000, capAlpha * 0.2);
+        gfx.drawCircle(rx, ry, 1.2);
+        gfx.endFill();
+      }
     } else if (particle.kind === "trail") {
       const trailColor = cssColorToNum(particle.color);
       gfx.beginFill(trailColor, ratio * 0.35);
@@ -2954,6 +3000,14 @@ function updateParticles(dt) {
       particle.x += particle.vx * dt;
       particle.y += particle.vy * dt;
 
+      // Bottle cap physics
+      if (particle.kind === "bottlecap") {
+        particle.vy += 260 * dt; // gravity (lighter than blood)
+        particle.vx *= 0.99;
+        particle.rotation = (particle.rotation || 0) + dt * (particle.rotSpeed || 5);
+        // slight wobble
+        particle.vx += Math.sin(particle.life * 12) * 8 * dt;
+      }
       // Gravity for blood and debris
       if (particle.kind === "blood" || particle.kind === "debris") {
         particle.vy += 380 * dt;
@@ -4359,13 +4413,59 @@ function hideVictoryOverlay() {
 function maybeCelebrate(now) {
   if (!state.victory.visible || !state.champion) return;
   if (now - state.battle.finishedAt > 6200) return;
-  if (now - state.battle.lastFireworkAt < 320) return;
+  if (now - state.battle.lastFireworkAt < 280) return;
 
   state.battle.lastFireworkAt = now;
-  spawnFireworkBurst(randomRange(190, 810), randomRange(80, 260));
-  playFireworkSound();
-  state.arena.intensity = Math.min(1, state.arena.intensity + 0.16);
+
+  // Spawn bottle caps flying up from the bottom!
+  spawnBottleCaps(randomRange(100, 900), WORLD_HEIGHT + 10, randomInt(3, 7));
+
+  // Also occasional firework burst
+  if (Math.random() < 0.3) {
+    spawnFireworkBurst(randomRange(190, 810), randomRange(80, 260));
+  }
+
+  // Beer opening sound for each wave
+  playBeerOpenSound();
+
+  state.arena.intensity = Math.min(1, state.arena.intensity + 0.12);
   renderArenaHud();
+}
+
+function spawnBottleCaps(x, y, count) {
+  const capColors = [
+    0xd4a017, // gold/yellow (classic beer)
+    0xcc3333, // red
+    0x2266aa, // blue
+    0x228833, // green
+    0xdd6611, // orange
+    0x884488, // purple
+    0xdddddd, // silver/white
+    0x885522, // brown
+    0xcc8800, // amber
+    0x336655, // teal
+  ];
+
+  for (let i = 0; i < count; i++) {
+    const spreadX = randomRange(-60, 60);
+    const speed = randomRange(280, 520); // how high they fly
+    const sideSpeed = randomRange(-80, 80);
+
+    state.particles.push({
+      kind: "bottlecap",
+      x: x + spreadX,
+      y: y,
+      vx: sideSpeed,
+      vy: -speed, // fly UP
+      life: randomRange(2.0, 3.5),
+      maxLife: 3.5,
+      size: randomRange(4, 7),
+      capColor: pick(capColors),
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: randomRange(5, 15) * (Math.random() > 0.5 ? 1 : -1),
+      alpha: 1,
+    });
+  }
 }
 
 function spawnFireworkBurst(x, y) {
@@ -4470,6 +4570,26 @@ function playFireworkSound() {
   const time = context.currentTime;
   playTone(time, randomRange(480, 820), randomRange(140, 240), 0.18, "triangle", 0.06);
   playNoiseBurst(time + 0.03, 0.2, 0.04, randomRange(1800, 2600));
+}
+
+function playBeerOpenSound() {
+  const context = state.sound.context;
+  if (!context || !state.sound.enabled) return;
+
+  const time = context.currentTime;
+  const slight = Math.random() * 0.02; // tiny random offset for variety
+
+  // "Pop" - short sharp click (bottle cap popping off)
+  playTone(time + slight, 1800, 400, 0.06, "square", 0.12);
+  playTone(time + slight, 2400, 600, 0.04, "sawtooth", 0.08);
+
+  // "Psshh" - carbonation hiss (filtered noise)
+  playNoiseBurst(time + 0.03 + slight, 0.35, 0.07, 4500);
+  playNoiseBurst(time + 0.06 + slight, 0.25, 0.04, 6000);
+
+  // Metallic clink of cap bouncing
+  playTone(time + 0.08 + slight, 3200, 1200, 0.05, "sine", 0.04);
+  playTone(time + 0.15 + slight, 2800, 800, 0.04, "sine", 0.03);
 }
 
 function playWallHitSound() {
