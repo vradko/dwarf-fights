@@ -4377,6 +4377,70 @@ function maybeCelebrate(now) {
 }
 
 // ── DOM BOTTLE CAP CELEBRATION ───────────────────────────
+function makeCapSVG(size, color, label) {
+  const r = size / 2;
+  const teeth = 21;
+  const outerR = r;
+  const innerR = r * 0.88;
+  // Crimped edge path
+  let d = '';
+  for (let i = 0; i < teeth; i++) {
+    const a1 = (Math.PI * 2 * i) / teeth;
+    const a2 = (Math.PI * 2 * (i + 0.5)) / teeth;
+    const ox = r + Math.cos(a1) * outerR;
+    const oy = r + Math.sin(a1) * outerR;
+    const ix = r + Math.cos(a2) * innerR;
+    const iy = r + Math.sin(a2) * innerR;
+    d += (i === 0 ? 'M' : 'L') + ox.toFixed(1) + ',' + oy.toFixed(1);
+    d += 'L' + ix.toFixed(1) + ',' + iy.toFixed(1);
+  }
+  d += 'Z';
+
+  // Parse hex color for lighter/darker variants
+  const hex = color.replace('#', '');
+  const cr = parseInt(hex.substr(0, 2), 16);
+  const cg = parseInt(hex.substr(2, 2), 16);
+  const cb = parseInt(hex.substr(4, 2), 16);
+  const lighter = `rgb(${Math.min(255, cr + 60)},${Math.min(255, cg + 60)},${Math.min(255, cb + 60)})`;
+  const darker = `rgb(${Math.max(0, cr - 40)},${Math.max(0, cg - 40)},${Math.max(0, cb - 40)})`;
+  const darkest = `rgb(${Math.max(0, cr - 70)},${Math.max(0, cg - 70)},${Math.max(0, cb - 70)})`;
+
+  const uid = 'cap' + Math.random().toString(36).substr(2, 6);
+  const ir = r * 0.72; // inner face radius
+
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="${uid}g" cx="40%" cy="35%">
+        <stop offset="0%" stop-color="${lighter}"/>
+        <stop offset="50%" stop-color="${color}"/>
+        <stop offset="100%" stop-color="${darker}"/>
+      </radialGradient>
+      <radialGradient id="${uid}f" cx="45%" cy="40%">
+        <stop offset="0%" stop-color="${lighter}"/>
+        <stop offset="60%" stop-color="${color}"/>
+        <stop offset="100%" stop-color="${darkest}"/>
+      </radialGradient>
+      <filter id="${uid}s">
+        <feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.5"/>
+      </filter>
+    </defs>
+    <!-- Crimped edge body -->
+    <path d="${d}" fill="url(#${uid}g)" stroke="${darkest}" stroke-width="0.5" filter="url(#${uid}s)"/>
+    <!-- Inner lip ring (raised edge) -->
+    <circle cx="${r}" cy="${r}" r="${r * 0.78}" fill="none" stroke="${darkest}" stroke-width="1.5" opacity="0.4"/>
+    <circle cx="${r}" cy="${r}" r="${r * 0.76}" fill="none" stroke="${lighter}" stroke-width="0.5" opacity="0.3"/>
+    <!-- Inner face -->
+    <circle cx="${r}" cy="${r}" r="${ir}" fill="url(#${uid}f)"/>
+    <!-- Metallic sheen -->
+    <ellipse cx="${r * 0.7}" cy="${r * 0.6}" rx="${ir * 0.5}" ry="${ir * 0.35}" fill="white" opacity="0.12"/>
+    <!-- Center emblem -->
+    <text x="${r}" y="${r}" text-anchor="middle" dominant-baseline="central" font-size="${size * 0.3}" font-weight="900" fill="rgba(255,255,255,0.6)" style="text-shadow:0 1px 2px rgba(0,0,0,0.5)">${label}</text>
+    <!-- Worn scratches -->
+    <line x1="${r * 0.5}" y1="${r * 0.4}" x2="${r * 1.3}" y2="${r * 0.7}" stroke="white" stroke-width="0.4" opacity="0.15"/>
+    <line x1="${r * 0.7}" y1="${r * 1.3}" x2="${r * 1.5}" y2="${r * 1.1}" stroke="white" stroke-width="0.3" opacity="0.1"/>
+  </svg>`;
+}
+
 function launchBottleCapCelebration() {
   const capColors = [
     '#d4a017', '#cc3333', '#2266aa', '#228833', '#dd6611',
@@ -4395,52 +4459,12 @@ function launchBottleCapCelebration() {
         pointer-events: none;
         will-change: transform, bottom;
       }
-      .bottle-cap__inner {
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        position: relative;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 900;
-        color: rgba(255,255,255,0.5);
-        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-      }
-      .bottle-cap__inner::before {
-        content: '';
-        position: absolute;
-        inset: 3px;
-        border-radius: 50%;
-        border: 2px solid rgba(255,255,255,0.2);
-      }
-      .bottle-cap__inner::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 50%;
-        background: conic-gradient(
-          rgba(0,0,0,0.15) 0deg, transparent 15deg,
-          rgba(0,0,0,0.15) 30deg, transparent 45deg,
-          rgba(0,0,0,0.15) 60deg, transparent 75deg,
-          rgba(0,0,0,0.15) 90deg, transparent 105deg,
-          rgba(0,0,0,0.15) 120deg, transparent 135deg,
-          rgba(0,0,0,0.15) 150deg, transparent 165deg,
-          rgba(0,0,0,0.15) 180deg, transparent 195deg,
-          rgba(0,0,0,0.15) 210deg, transparent 225deg,
-          rgba(0,0,0,0.15) 240deg, transparent 255deg,
-          rgba(0,0,0,0.15) 270deg, transparent 285deg,
-          rgba(0,0,0,0.15) 300deg, transparent 315deg,
-          rgba(0,0,0,0.15) 330deg, transparent 345deg
-        );
-      }
     `;
     document.head.appendChild(style);
   }
 
   const totalCaps = 40;
-  const totalDuration = 3500; // spawn over 3.5 seconds
+  const totalDuration = 3500;
 
   for (let i = 0; i < totalCaps; i++) {
     setTimeout(() => {
@@ -4451,7 +4475,7 @@ function launchBottleCapCelebration() {
 }
 
 function spawnDomBottleCap(colors, labels) {
-  const size = 28 + Math.random() * 20; // 28-48px
+  const size = 32 + Math.random() * 24; // 32-56px
   const color = colors[Math.floor(Math.random() * colors.length)];
   const label = labels[Math.floor(Math.random() * labels.length)];
 
@@ -4461,7 +4485,7 @@ function spawnDomBottleCap(colors, labels) {
   cap.style.height = size + 'px';
   cap.style.left = (Math.random() * 100) + 'vw';
   cap.style.bottom = '-60px';
-  cap.innerHTML = `<div class="bottle-cap__inner" style="background:${color};font-size:${size * 0.35}px">${label}</div>`;
+  cap.innerHTML = makeCapSVG(size, color, label);
   document.body.appendChild(cap);
 
   // Physics
