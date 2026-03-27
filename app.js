@@ -12,6 +12,204 @@ const ARENA_RX = 300;
 const ARENA_RY = 176;
 const PROFILE_CACHE = new Map();
 
+// ── TRASH FACTS ──────────────────────────────────────────
+const TRASH_FACTS = [
+  "Can outrun a stray dog (tested twice)",
+  "Once wrestled a bear at the zoo and called it a draw",
+  "Stole a zebra and rode it through downtown",
+  "Sleeps with one eye open and a brick under the pillow",
+  "Ate a raw onion to impress nobody",
+  "Has been banned from 4 different supermarkets",
+  "Can open a beer bottle with their teeth",
+  "Once punched a vending machine and won",
+  "Survived a week eating only ketchup packets",
+  "Has a tattoo of a tattoo",
+  "Was raised by pigeons in a parking lot",
+  "Can smell rain 3 days before it comes",
+  "Knows 47 ways to start a fire without matches",
+  "Once headbutted a door open at a police station",
+  "Has never lost a staring contest",
+  "Traded a stolen bike for a goat, then traded the goat for a better bike",
+  "Can sleep standing up in a moving bus",
+  "Fought a raccoon for a sandwich and shared it afterwards",
+  "Has been struck by lightning and gave it 3 stars",
+  "Can hold their breath for 4 minutes (claims 7)",
+  "Once ate 43 dumplings in one sitting",
+  "Has a criminal record in a country that doesn't exist anymore",
+  "Can whistle with a mouth full of crackers",
+  "Was kicked out of a fight club for fighting too much",
+  "Once drove a shopping cart down a highway",
+  "Speaks fluent trash talk in 6 languages",
+  "Has a black belt in aggressive negotiations",
+  "Can identify any cheap vodka by smell alone",
+  "Climbed a cell tower to get better Wi-Fi",
+  "Won a fistfight with a frozen chicken",
+  "Has been escorted out of every zoo in the region",
+  "Can run a 5k in flip-flops",
+  "Once used a fish as a weapon in a bar fight",
+  "Has more scars than memories",
+  "Built a shelter out of stolen road signs",
+  "Can crack walnuts with their forehead",
+  "Has been chased by police on 3 continents",
+  "Can hot-wire a lawnmower in under 30 seconds",
+  "Once arm-wrestled a bouncer and won the bar tab",
+  "Survived a 3-story fall into a dumpster",
+  "Has memorized every bus schedule in the city",
+  "Can throw a brick with surgical precision",
+  "Once traded punches with a kangaroo at a circus",
+  "Has a PhD in street pharmacology",
+  "Can pick any lock with a hairpin and anger",
+  "Once swam across a river holding a stolen TV",
+  "Has been legally dead twice (paperwork issue)",
+  "Can outdrink a sailor and outfight a soldier",
+  "Was banned from a monastery for being too loud",
+  "Has a pet rat named Lawyer",
+  "Can cook a 5-course meal with a campfire and a shovel",
+  "Once bit a police dog in self-defense",
+  "Knows which dumpsters have the best food on which days",
+  "Has broken more bones than they can count (on both hands)",
+  "Can bench press a park bench",
+  "Once challenged a train and moved out of the way just in time",
+  "Has a collection of confiscated IDs from various countries",
+  "Can navigate any city by smell alone",
+  "Once won a street race in a stolen wheelchair",
+  "Has punched every wall in their apartment at least once",
+  "Can survive any winter with just a newspaper and rage",
+  "Once ate a cactus on a dare and asked for seconds",
+  "Was raised in a construction site",
+  "Has been to prison but only as a tourist (allegedly)",
+  "Can fix any car with duct tape and swearing",
+  "Once headbutted a parking meter and got change back",
+  "Has slept in more parks than apartments",
+  "Can predict fights before they start (usually starts them)",
+  "Once outran a police horse",
+  "Has a secret food stash in every neighborhood",
+  "Can drink boiling soup without flinching",
+  "Once threw a shoe so hard it became a legend",
+  "Has been in more ambulances than taxis",
+  "Knows the exact price of every item in every pawn shop",
+  "Can do a backflip (has never landed one)",
+  "Once caught a pigeon with bare hands and released it (for a fee)",
+  "Has a scar from a fight that hasn't happened yet",
+  "Can fall asleep anywhere in under 2 minutes",
+  "Once used a manhole cover as a shield",
+  "Has been fired from every job they never had",
+  "Can bite through a belt",
+  "Once won a fight using only a rolled-up newspaper",
+  "Has a wanted poster that they autographed",
+  "Can climb any fence regardless of barbed wire",
+  "Once lived in a car for 6 months (not their car)",
+  "Has more street names than a GPS",
+  "Can tell time by the position of stray cats",
+  "Once intimidated a bouncer by just standing there",
+  "Has eaten food from every continent's dumpsters",
+  "Can start a fire by rubbing two grudges together",
+  "Once traded a black eye for a free meal",
+  "Has been in 14 countries without a passport",
+  "Can smell a cop from 3 blocks away",
+  "Once body-slammed a door off its hinges",
+  "Has a loyalty card at the emergency room",
+  "Can make a weapon out of anything in a 2-meter radius",
+  "Once challenged a bull and won on points",
+  "Has been banned from public transportation for life",
+  "Can eat a lemon without making a face",
+  "Once rode on top of a train for 200km",
+  "Has punched a ghost (claims it punched back)",
+  "Can juggle knives (has 9 fingers to prove it)",
+  "Once stole a cop's lunch and ate it in front of them",
+  "Has survived 3 building demolitions (was inside)",
+  "Can do 100 push-ups (over the course of a week)",
+  "Once won a pie-eating contest without using hands",
+  "Has a map of every unlocked basement in the district",
+  "Can dodge a thrown bottle 9 times out of 10",
+  "Once fought 5 people at once and called it cardio",
+  "Has never paid full price for anything",
+  "Can hold a plank for 45 seconds (personal record)",
+  "Once befriended a wolf by sharing a sausage",
+  "Has been featured in 2 police sketches (both inaccurate)",
+  "Can crack an egg with one hand and someone's skull with the other",
+  "Once lifted a motorcycle to win a bet",
+  "Has a secret handshake with every stray dog in town",
+  "Can recognize any car alarm by sound",
+  "Once escaped a locked room using only a spoon",
+  "Has been kicked out of 12 different countries",
+  "Can peel a potato in under 3 seconds with a knife",
+  "Once survived a month on energy drinks and spite",
+  "Has a sixth sense for free food within 500 meters",
+  "Can break a coconut with their elbow",
+  "Once drank from a puddle and said it was refreshing",
+  "Has been to court more times than to a dentist",
+  "Can throw a punch faster than most people blink",
+  "Once used a cat as a pillow (cat approved)",
+  "Has a reputation in neighborhoods they've never visited",
+  "Can outswim a duck",
+  "Once crashed a wedding and became best man",
+  "Has a filing system for grudges",
+  "Can eat an entire pizza in 3 minutes flat",
+  "Once jumped from a balcony into a pool (missed slightly)",
+  "Has outrun a security guard in sandals",
+  "Can open a can with a rock and determination",
+  "Once talked their way out of an arrest (twice)",
+  "Has a black market credit score",
+  "Can identify 30 different mushrooms (22 of them edible)",
+  "Once slept through an earthquake and blamed the neighbors",
+  "Has been in a fistfight during a job interview",
+  "Can fix a broken nose with two fingers and no mirror",
+  "Once caught a fly with chopsticks (then ate it)",
+  "Has a reserved seat at the local pawn shop",
+  "Can sense when someone is about to throw a punch",
+  "Once challenged a goose and retreated strategically",
+  "Has never voluntarily visited a doctor",
+  "Can hide in plain sight by standing very still",
+  "Once ate cereal with water and said it was better",
+  "Has a nemesis in every postal code",
+  "Can disassemble a chair and reassemble it as a weapon",
+  "Once arm-wrestled both arms at the same time (different opponents)",
+  "Has escaped from handcuffs using only willpower (and a key)",
+  "Can parallel park a shopping cart better than most park a car",
+  "Once fell off a roof and blamed gravity",
+  "Has a survival kit made entirely of stolen items",
+  "Can make friends and enemies in the same sentence",
+  "Once challenged a statue to a staring contest and won",
+  "Has a folder of complaints written about them (keeps it as a trophy)",
+  "Can run backwards faster than most people run forward",
+  "Once wrestled an octopus (at a fish market)",
+  "Has been struck by a bicycle and kept walking",
+  "Can whistle the national anthem of 12 countries",
+  "Once head-butted a frozen lake to go fishing",
+  "Has a PhD from the school of hard knocks (and a diploma to prove it)",
+  "Can do mental math but only for stolen goods",
+  "Once fought their own reflection and lost",
+  "Has been on 3 reality shows (was escorted off all 3)",
+  "Can balance a brick on their head while running",
+  "Once traded a stolen watch for a boat (it sank)",
+  "Has memorized the wifi passwords of 40+ locations",
+  "Can survive any hangover with raw eggs and anger",
+  "Once entered a marathon by accident and finished 12th",
+  "Has a pet crow that delivers small items",
+  "Can spit watermelon seeds with military precision",
+  "Once punched a hole in a wall to create a window",
+  "Has never apologized and doesn't plan to start",
+  "Can construct a raft from garbage in under an hour",
+  "Once scared a scarecrow",
+  "Has been chased by an ostrich and learned from it",
+  "Can eat a raw garlic clove like an apple",
+  "Once slept inside a washing machine (it was off)",
+  "Has a 100% win rate in fights they choose to remember",
+  "Can skin a fish with a credit card",
+  "Once convinced a toll booth they were a government vehicle",
+  "Has worn the same jacket for 7 years (it has stories)",
+  "Can sense when a store is about to throw out food",
+  "Once body-checked a moose (the moose was confused)",
+  "Has a black belt in dumpster diving",
+  "Can drink any liquid regardless of temperature or origin",
+  "Once hitchhiked on a garbage truck across 3 states",
+  "Has a criminal record that reads like an adventure novel",
+  "Can catch a baseball without a glove (has tried with a brick)",
+  "Once outate a competitive eater at a gas station",
+  "Has been temporarily mayor of a town that doesn't exist",
+];
+
 // ── ISOMETRIC PROJECTION ─────────────────────────────────
 const ISO_SCALE = 0.55; // Y-axis compression for isometric perspective
 function isoY(wy) { return CENTER_Y + (wy - CENTER_Y) * ISO_SCALE; }
@@ -1778,9 +1976,7 @@ function attack(attacker, defender, now) {
   if (!attacker.alive || !defender.alive) return;
 
   // ── DODGE / BLOCK CHECK ──
-  // Agility-based dodge chance (5-18%)
-  const dodgeChance = 0.03 + defender.agility * 0.015;
-  const isDodge = Math.random() < dodgeChance;
+  const isDodge = Math.random() < (defender.dodgeChance || 0.1);
   if (isDodge) {
     const angle = Math.atan2(defender.y - attacker.y, defender.x - attacker.x);
     attacker.cooldown = Math.max(0.15, 0.55 - attacker.agility * 0.03 + Math.random() * 0.12);
@@ -1814,27 +2010,44 @@ function attack(attacker, defender, now) {
     return;
   }
 
+  // ── HIT CHECK ──
+  const isHit = Math.random() < (attacker.hitChance || 0.75);
+  if (!isHit) {
+    // Swing and miss
+    attacker.cooldown = Math.max(0.2, 0.5 + Math.random() * 0.15);
+    attacker.attackPulse = 0.5;
+    defender.dmgNumbers = defender.dmgNumbers || [];
+    const missText2 = new PIXI.Text("MISS", {
+      fontFamily: "Trebuchet MS, Arial", fontSize: 11, fontWeight: "900",
+      fill: 0x999999, stroke: 0x000000, strokeThickness: 2, align: "center",
+    });
+    missText2.anchor.set(0.5);
+    missText2.position.set(randomRange(-8, 8), -35);
+    missText2._dmgLife = 0.6;
+    missText2._dmgVelX = randomRange(-0.4, 0.4);
+    missText2._dmgVelY = -1.8;
+    defender.container.addChild(missText2);
+    defender.dmgNumbers.push(missText2);
+    return;
+  }
+
   // ── DAMAGE CALCULATION ──
-  // Base damage: weapon + power + randomness
-  const baseDamage = attacker.power * 0.8 + attacker.weapon.power * 0.7 + randomInt(2, 7);
+  // Base damage: weapon + randomness
+  const baseDamage = attacker.weapon.power * 0.9 + randomInt(3, 9);
 
-  // Damage variance: ±30% randomness for unpredictability
-  const variance = 0.7 + Math.random() * 0.6;
+  // Damage variance: ±35% randomness
+  const variance = 0.65 + Math.random() * 0.7;
 
-  // Critical hit: higher chance with chaos stat
-  const critChance = 0.08 + attacker.chaos * 0.015;
-  const isCrit = Math.random() < critChance;
-  const critMultiplier = isCrit ? (1.8 + Math.random() * 0.7) : 1.0;
+  // Critical hit from profile
+  const isCrit = Math.random() < (attacker.critChance || 0.1);
+  const critMultiplier = isCrit ? (2.0 + Math.random() * 1.0) : 1.0;
 
-  // Defender's toughness reduces damage (power acts as armor too)
-  const defenseReduction = 0.85 - defender.power * 0.02;
-
-  // Glancing blow chance: low damage hit (15% chance)
-  const isGlancing = !isCrit && Math.random() < 0.15;
-  const glancingMult = isGlancing ? 0.4 : 1.0;
+  // Glancing blow chance: low damage hit (12% chance)
+  const isGlancing = !isCrit && Math.random() < 0.12;
+  const glancingMult = isGlancing ? 0.35 : 1.0;
 
   // Final damage formula
-  let damage = baseDamage * variance * critMultiplier * defenseReduction * glancingMult;
+  let damage = baseDamage * variance * critMultiplier * glancingMult;
   damage = Math.max(2, Math.round(damage));
 
   const angle = Math.atan2(defender.y - attacker.y, defender.x - attacker.x);
@@ -2032,9 +2245,7 @@ function finishBattle(winner, now) {
     message: pick(CHAMPION_MESSAGES),
     visual: winner.visual,
     portraitIndex: winner.portraitIndex,
-    power: winner.power,
-    agility: winner.agility,
-    chaos: winner.chaos,
+    facts: winner.facts || [],
     eliminations: winner.eliminations,
   };
   saveChampion();
@@ -3002,11 +3213,11 @@ function renderRoster() {
             <img src="./assets/dwarf-portrait-${profile.portraitIndex}.jpg" alt="${escapeHtml(profile.personName)} portrait" style="width:100%;border-radius:12px;" />
           </div>
           <div class="roster-card__stats">
-            <span class="stat-chip">Power ${profile.power}</span>
-            <span class="stat-chip">Speed ${profile.agility}</span>
-            <span class="stat-chip">Chaos ${profile.chaos}</span>
-            <span class="stat-chip">${profile.weapon.name}</span>
+            <span class="stat-chip">🔪 ${profile.weapon.name}</span>
           </div>
+          <ul class="roster-card__facts">
+            ${(profile.facts || []).map(f => `<li>• ${escapeHtml(f)}</li>`).join('')}
+          </ul>
         </article>
       `;
     })
@@ -3039,11 +3250,12 @@ function renderChampion() {
         <p class="champion-card__line">${escapeHtml(state.champion.message)}</p>
         <p class="champion-card__weapon">${escapeHtml(state.champion.weapon)}</p>
         <div class="champion-card__stats">
-          <span class="stat-chip">Power ${state.champion.power}</span>
-          <span class="stat-chip">Speed ${state.champion.agility}</span>
-          <span class="stat-chip">Chaos ${state.champion.chaos}</span>
-          <span class="stat-chip">Knockouts ${state.champion.eliminations}</span>
+          <span class="stat-chip">🔪 ${escapeHtml(state.champion.weapon)}</span>
+          <span class="stat-chip">💀 ${state.champion.eliminations} knockouts</span>
         </div>
+        <ul class="roster-card__facts">
+          ${(state.champion.facts || []).map(f => `<li>• ${escapeHtml(f)}</li>`).join('')}
+        </ul>
       </div>
     </div>
   `;
@@ -3201,10 +3413,24 @@ function getProfile(participant) {
   const archetype = seededPick(rng, ARCHETYPES);
   const weaponPool = buildWeaponPool(archetype);
   const weapon = seededPick(rng, weaponPool);
-  const power = seededInt(rng, 5, 10);
-  const agility = seededInt(rng, 4, 10);
-  const chaos = seededInt(rng, 4, 10);
+  // Equal base stats for all fighters
+  const power = 7;
+  const agility = 7;
+  const chaos = 7;
   const alias = `${seededPick(rng, DWARF_PREFIXES)} ${seededPick(rng, DWARF_BASE_NAMES)} ${seededPick(rng, DWARF_SUFFIXES)}`;
+
+  // Random combat modifiers (the real differentiator)
+  const hitChance = 0.65 + rng() * 0.25;       // 65-90% chance to land a hit
+  const critChance = 0.05 + rng() * 0.18;       // 5-23% crit chance
+  const dodgeChance = 0.05 + rng() * 0.2;       // 5-25% dodge chance
+
+  // Pick 3 unique random trash facts
+  const factPool = [...TRASH_FACTS];
+  const facts = [];
+  for (let f = 0; f < 3; f++) {
+    const idx = Math.floor(rng() * factPool.length);
+    facts.push(factPool.splice(idx, 1)[0]);
+  }
 
   const profile = {
     id: participant.id,
@@ -3216,7 +3442,11 @@ function getProfile(participant) {
     power,
     agility,
     chaos,
-    maxHp: 150 + power * 8 + agility * 4,
+    hitChance,
+    critChance,
+    dodgeChance,
+    facts,
+    maxHp: 210,
     reach: weapon.reach,
     visual: {
       skin: seededPick(rng, SKIN_TONES),

@@ -561,6 +561,19 @@ textarea:disabled {
   color: var(--text);
 }
 
+.roster-card__facts {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0 0;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.5;
+  font-style: italic;
+}
+.roster-card__facts li {
+  padding: 1px 0;
+}
+
 .remove-button {
   width: 36px;
   height: 36px;
