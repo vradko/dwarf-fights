@@ -1867,19 +1867,30 @@ function updateBattle(dt, now) {
     let steerX = pushX * 1.8 + jitterX;
     let steerY = pushY * 1.8 + jitterY;
 
+    // Final duel mode: when 2 fighters left, go full berserker
+    const isFinalDuel = alive.length <= 2;
+    const isEndgame = alive.length <= 4;
+
     if (distance > desiredRange) {
-      // Chase target aggressively
-      const chaseBoost = alive.length <= 4 ? 1.4 : 1.1;
+      // Chase target
+      const chaseBoost = isFinalDuel ? 2.2 : isEndgame ? 1.4 : 1.1;
       steerX += (dx / distance) * fighter.mobility * chaseBoost;
       steerY += (dy / distance) * fighter.mobility * chaseBoost * 0.9;
     } else {
-      // In range - mostly face and fight, minimal orbiting
-      const orbitForce = alive.length <= 3 ? 0.1 : 0.35;
-      steerX += tangentX * orbitForce;
-      steerY += tangentY * orbitForce;
-      // Push slightly towards target to stay in melee range
-      steerX += (dx / distance) * 0.3;
-      steerY += (dy / distance) * 0.3;
+      // In range - fight!
+      if (isFinalDuel) {
+        // Final duel: NO orbiting, charge straight in, attack fast
+        steerX += (dx / distance) * 1.2;
+        steerY += (dy / distance) * 1.2;
+        // Reduce cooldown in final duel
+        if (fighter.cooldown > 0) fighter.cooldown *= 0.85;
+      } else {
+        const orbitForce = isEndgame ? 0.1 : 0.35;
+        steerX += tangentX * orbitForce;
+        steerY += tangentY * orbitForce;
+        steerX += (dx / distance) * 0.3;
+        steerY += (dy / distance) * 0.3;
+      }
       if (fighter.cooldown <= 0) {
         attack(fighter, nearest, now);
       }
@@ -2059,8 +2070,12 @@ function attack(attacker, defender, now) {
   defender.hitStagger = isGlancing ? 0.3 : 1;
   defender.hitWobbleTime = 0;
 
-  // Rage mechanic: damage slowly increases after 45s to prevent endless fights
-  const rageFactor = Math.max(1, 1 + ((state.battle.elapsed || 0) - 45) * 0.025);
+  // Rage mechanic: damage increases over time to prevent stalemates
+  const elapsed = state.battle.elapsed || 0;
+  const aliveCount = state.fighters.filter(f => f.alive).length;
+  // Base rage ramps after 30s; final duel gets extra 50% rage
+  let rageFactor = Math.max(1, 1 + (elapsed - 30) * 0.04);
+  if (aliveCount <= 2) rageFactor *= 1.5;
   const finalDamage = Math.round(damage * rageFactor);
 
   // Spawn damage number
