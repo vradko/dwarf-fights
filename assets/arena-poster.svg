@@ -1,0 +1,121 @@
+<svg width="900" height="780" viewBox="0 0 900 780" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="450" y1="0" x2="450" y2="780" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#170718" />
+      <stop offset="0.45" stop-color="#37113F" />
+      <stop offset="1" stop-color="#09050D" />
+    </linearGradient>
+    <radialGradient id="amberGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(454 348) rotate(90) scale(260 340)">
+      <stop stop-color="#FFBE2F" stop-opacity="0.95" />
+      <stop offset="1" stop-color="#FFBE2F" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="pinkGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(204 148) rotate(90) scale(280 280)">
+      <stop stop-color="#FF5EBD" stop-opacity="0.75" />
+      <stop offset="1" stop-color="#FF5EBD" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="cyanGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(694 166) rotate(90) scale(250 250)">
+      <stop stop-color="#6BE6FF" stop-opacity="0.75" />
+      <stop offset="1" stop-color="#6BE6FF" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="beamPink" x1="170" y1="38" x2="294" y2="434" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF5EBD" stop-opacity="0.38" />
+      <stop offset="1" stop-color="#FF5EBD" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="beamAmber" x1="450" y1="0" x2="450" y2="478" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFBE2F" stop-opacity="0.4" />
+      <stop offset="1" stop-color="#FFBE2F" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="beamCyan" x1="720" y1="26" x2="602" y2="430" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6BE6FF" stop-opacity="0.38" />
+      <stop offset="1" stop-color="#6BE6FF" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="rope" x1="230" y1="320" x2="676" y2="486" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E6A13B" />
+      <stop offset="1" stop-color="#8C603A" />
+    </linearGradient>
+  </defs>
+
+  <rect width="900" height="780" rx="40" fill="url(#bg)" />
+  <rect width="900" height="780" rx="40" fill="url(#pinkGlow)" />
+  <rect width="900" height="780" rx="40" fill="url(#cyanGlow)" />
+  <rect width="900" height="780" rx="40" fill="url(#amberGlow)" />
+
+  <path d="M152 32L252 422H330L188 32H152Z" fill="url(#beamPink)" />
+  <path d="M398 0H502L576 484H324L398 0Z" fill="url(#beamAmber)" />
+  <path d="M752 28L652 422H572L714 28H752Z" fill="url(#beamCyan)" />
+
+  <g opacity="0.35" fill="#FFF5DC">
+    <circle cx="108" cy="194" r="30" />
+    <rect x="82" y="216" width="52" height="72" rx="16" />
+    <circle cx="188" cy="148" r="26" />
+    <rect x="166" y="168" width="44" height="66" rx="16" />
+    <circle cx="760" cy="166" r="28" />
+    <rect x="736" y="188" width="48" height="68" rx="16" />
+    <circle cx="828" cy="232" r="34" />
+    <rect x="800" y="258" width="56" height="84" rx="18" />
+    <circle cx="702" cy="246" r="26" />
+    <rect x="680" y="266" width="44" height="60" rx="14" />
+    <circle cx="452" cy="142" r="22" />
+    <rect x="434" y="160" width="36" height="50" rx="12" />
+  </g>
+
+  <path d="M176 536L276 336H624L724 536L606 666H294L176 536Z" fill="#18161F" stroke="#8F6940" stroke-width="16" />
+  <path d="M200 534L292 360H608L700 534L596 642H304L200 534Z" fill="#20252F" stroke="#F8C76E" stroke-width="5" />
+  <path d="M226 532L308 384H592L674 532L584 624H316L226 532Z" fill="#303744" stroke="#A8B0BC" stroke-opacity="0.35" stroke-width="2" />
+
+  <g opacity="0.25" stroke="#FFF5DC" stroke-width="2">
+    <path d="M252 530L328 398H572L648 530L566 604H334L252 530Z" />
+    <path d="M278 530L346 414H554L622 530L548 588H352L278 530Z" />
+    <path d="M450 386V622" />
+    <path d="M286 454H614" />
+  </g>
+
+  <g opacity="0.7" stroke="url(#rope)" stroke-width="8">
+    <path d="M216 424H684" />
+    <path d="M196 470H704" />
+    <path d="M226 378H674" />
+  </g>
+
+  <g transform="translate(310 374)">
+    <ellipse cx="0" cy="112" rx="52" ry="12" fill="black" fill-opacity="0.28" />
+    <circle cx="0" cy="32" r="34" fill="#F4D4B9" />
+    <path d="M-38 38C-24 -26 24 -26 38 36L18 48C16 18 8 2 0 2C-8 2 -16 18 -18 48Z" fill="#FF3E2E" />
+    <path d="M-6 4L12 -54L22 8L8 52H-10Z" fill="#FF3E2E" />
+    <rect x="-42" y="62" width="84" height="68" rx="24" fill="#52D967" />
+    <path d="M-38 42L0 164L38 42Z" fill="#FFF4D4" />
+    <rect x="-16" y="114" width="32" height="14" rx="7" fill="#43281F" />
+    <rect x="-30" y="130" width="20" height="42" rx="8" fill="#2D7CFF" />
+    <rect x="10" y="130" width="20" height="42" rx="8" fill="#2D7CFF" />
+    <rect x="-34" y="166" width="28" height="12" rx="6" fill="#A21F1A" />
+    <rect x="6" y="166" width="28" height="12" rx="6" fill="#A21F1A" />
+    <rect x="54" y="46" width="12" height="78" rx="6" fill="#6D4B36" transform="rotate(28 54 46)" />
+    <circle cx="84" cy="50" r="18" fill="#76808C" />
+    <circle cx="84" cy="50" r="10" fill="#434A54" />
+  </g>
+
+  <g transform="translate(566 396)">
+    <ellipse cx="0" cy="112" rx="52" ry="12" fill="black" fill-opacity="0.28" />
+    <circle cx="0" cy="32" r="34" fill="#EABF9E" />
+    <path d="M-36 36C-20 -26 30 -22 42 38L18 48C14 16 8 2 0 2C-8 2 -14 16 -18 48Z" fill="#FFBE2F" />
+    <path d="M-6 8L22 -42L16 36L8 52H-12Z" fill="#FFBE2F" />
+    <rect x="-44" y="60" width="88" height="70" rx="24" fill="#FF5EB0" />
+    <path d="M-36 42Q0 178 36 42Z" fill="#F3D39A" />
+    <rect x="-18" y="114" width="36" height="14" rx="7" fill="#3A231B" />
+    <rect x="-32" y="130" width="22" height="42" rx="8" fill="#FFC93B" />
+    <rect x="10" y="130" width="22" height="42" rx="8" fill="#FFC93B" />
+    <rect x="-36" y="166" width="30" height="12" rx="6" fill="#A21F1A" />
+    <rect x="6" y="166" width="30" height="12" rx="6" fill="#A21F1A" />
+    <rect x="-88" y="56" width="12" height="86" rx="6" fill="#6D4B36" transform="rotate(-28 -88 56)" />
+    <path d="M-126 28H-90V50H-126Z" fill="#86593C" />
+    <path d="M-122 50L-114 90" stroke="#86593C" stroke-width="6" />
+    <path d="M-94 50L-102 90" stroke="#86593C" stroke-width="6" />
+  </g>
+
+  <g fill="#FFF5DC" opacity="0.9">
+    <text x="70" y="642" font-family="Arial Black, Arial, sans-serif" font-size="78" letter-spacing="4">DWARF</text>
+    <text x="70" y="714" font-family="Arial Black, Arial, sans-serif" font-size="86" letter-spacing="5">FIGHTS</text>
+  </g>
+  <text x="74" y="742" fill="#FFBE2F" font-family="Trebuchet MS, Arial, sans-serif" font-size="24" letter-spacing="3">
+    GENERATED LOCAL ART  /  BROWSER ONLY CHAOS  /  OCTAGON RIOT
+  </text>
+</svg>

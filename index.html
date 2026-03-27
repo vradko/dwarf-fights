@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dwarf Fights Octagon Riot</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./pixi.min.js"></script>
+    <script src="./matter.min.js"></script>
+    <script defer src="./sprite-data.js"></script>
+    <script defer src="./app.js?v=11"></script>
+  </head>
+  <body>
+    <div class="backdrop" aria-hidden="true">
+      <div class="backdrop__beam backdrop__beam--left"></div>
+      <div class="backdrop__beam backdrop__beam--right"></div>
+      <div class="backdrop__noise"></div>
+    </div>
+
+    <div class="page-shell">
+      <header class="hero panel">
+        <div class="hero__copy">
+          <div class="eyebrow">Generated art. Browser-only chaos.</div>
+          <h1>DWARF FIGHTS</h1>
+          <p class="hero__lede">
+            Turn any group of names into a glorious octagon riot. Every fighter
+            gets a generated dwarf identity, a ridiculous weapon, a color palette,
+            combat stats, and one job: survive the pileup.
+          </p>
+
+          <div class="hero__badges">
+            <span>2 to 50 fighters</span>
+            <span>All visuals generated locally</span>
+            <span>Animated battle royale octagon</span>
+          </div>
+
+          <div class="welcome-card">
+            <div class="welcome-card__label">Arena intro line</div>
+            <p id="welcomeMessage" class="welcome-card__message"></p>
+            <button id="refreshGreetingBtn" class="ghost-button" type="button">
+              New intro
+            </button>
+          </div>
+        </div>
+
+        <div class="hero__art">
+          <img
+            class="hero__poster"
+            src="./hero-compilation.jpg"
+            alt="Dwarf Fights character roster compilation"
+          />
+          <img
+            class="hero__stamp"
+            src="./assets/champion-seal.svg"
+            alt="Champion seal"
+          />
+        </div>
+      </header>
+
+      <main class="main-layout">
+        <section class="panel control-panel">
+          <div class="section-heading">
+            <div>
+              <p class="section-heading__eyebrow">Recruitment desk</p>
+              <h2>Build the riot</h2>
+            </div>
+            <div id="rosterCount" class="counter-pill">0 / 50</div>
+          </div>
+
+          <form id="addForm" class="add-form">
+            <label class="input-label" for="nameInput">
+              Add fighters — one per line or comma-separated
+            </label>
+            <textarea
+              id="nameInput"
+              name="names"
+              rows="8"
+              maxlength="2000"
+              placeholder="Maya
+Liam
+Nora
+Theo, Ivy, Jude
+Oscar, Lena"
+              autocomplete="off"
+              style="width:100%;resize:vertical;min-height:120px;"
+            ></textarea>
+            <button class="primary-button" type="submit">Add fighters</button>
+          </form>
+
+          <div class="control-row">
+            <button id="seedNamesBtn" class="secondary-button" type="button">
+              Load sample roster
+            </button>
+            <button id="rerollDwarfsBtn" class="ghost-button" type="button">
+              Re-roll dwarfs
+            </button>
+            <button id="soundToggleBtn" class="ghost-button" type="button">
+              Sound: On
+            </button>
+            <button id="clearNamesBtn" class="ghost-button" type="button">
+              Clear roster
+            </button>
+          </div>
+
+          <div class="speed-box">
+            <div class="speed-header">
+              <span class="input-label">Battle speed</span>
+              <span id="speedLabel" class="speed-value">1.0×</span>
+            </div>
+            <input type="range" id="speedSlider" class="speed-slider" min="0.2" max="5" step="0.1" value="1">
+          </div>
+
+          <button id="startTournamentBtn" class="launch-button" type="button">
+            Start octagon riot
+          </button>
+
+          <p class="helper-text">
+            Everything runs in your browser. No backend, no uploads, no server
+            drama. The fighters, art, and octagon motion are generated locally.
+          </p>
+        </section>
+
+        <section class="panel roster-panel">
+          <div class="section-heading">
+            <div>
+              <p class="section-heading__eyebrow">Generated lineup</p>
+              <h2>Meet the tiny maniacs</h2>
+            </div>
+          </div>
+
+          <div id="rosterEmptyState" class="empty-state">
+            Add at least two names and the octagon will start demanding blood,
+            noise, and entirely unserious glory.
+          </div>
+          <div id="rosterList" class="roster-grid"></div>
+        </section>
+
+        <section class="panel arena-panel">
+          <div class="section-heading">
+            <div>
+              <p class="section-heading__eyebrow">Live arena</p>
+              <h2 id="arenaHeadline">Octagon on standby</h2>
+            </div>
+            <div id="arenaMeta" class="arena-meta">No fighters moving yet</div>
+          </div>
+
+          <div class="arena-stage">
+            <canvas
+              id="battleCanvas"
+              class="battle-canvas"
+              aria-label="Animated dwarf battle arena"
+            ></canvas>
+
+            <div class="arena-overlay">
+              <div class="arena-kpis">
+                <div class="hud-pill">
+                  <span>Alive</span>
+                  <strong id="aliveCount">0</strong>
+                </div>
+                <div class="hud-pill">
+                  <span>Knocked out</span>
+                  <strong id="koCount">0</strong>
+                </div>
+                <div class="hud-pill hud-pill--wide">
+                  <span>Chaos meter</span>
+                  <div class="meter">
+                    <span id="intensityFill" class="meter__fill"></span>
+                  </div>
+                  <strong id="intensityValue">0%</strong>
+                </div>
+              </div>
+            </div>
+
+            <div id="victoryOverlay" class="victory-overlay" aria-hidden="true">
+              <div class="victory-overlay__burst victory-overlay__burst--left"></div>
+              <div class="victory-overlay__burst victory-overlay__burst--right"></div>
+              <p class="victory-overlay__kicker">Last dwarf standing</p>
+              <h3 id="victoryWinner" class="victory-overlay__name">DWARF</h3>
+              <p id="victoryAlias" class="victory-overlay__alias">Alias line</p>
+              <p id="victoryTagline" class="victory-overlay__tagline">
+                The room has chosen a winner.
+              </p>
+            </div>
+          </div>
+
+          <div id="arenaStatus" class="arena-status">
+            Waiting for names, noise, and a deeply questionable decision to press
+            the button.
+          </div>
+        </section>
+
+        <section class="panel feed-panel">
+          <div class="section-heading">
+            <div>
+              <p class="section-heading__eyebrow">Crowd feed</p>
+              <h2>Live nonsense</h2>
+            </div>
+          </div>
+
+          <div id="eventLog" class="event-log"></div>
+        </section>
+
+        <section class="panel champion-panel">
+          <div class="section-heading">
+            <div>
+              <p class="section-heading__eyebrow">End of the mess</p>
+              <h2>Last dwarf standing</h2>
+            </div>
+          </div>
+
+          <div id="championEmptyState" class="empty-state">
+            Finish one riot and the final survivor will be crowned right here.
+          </div>
+          <div id="championCard" class="champion-card"></div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

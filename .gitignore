@@ -1,0 +1,8 @@
+.DS_Store
+.claude/
+__pycache__/
+*.pyc
+generate_sprites.py
+generate_portraits.py
+Gemini_Generated_Image_*
+dd153a794772fb0d4607ae8b0133d28e.jpg
