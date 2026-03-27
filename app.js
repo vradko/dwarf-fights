@@ -1777,32 +1777,89 @@ function syncFighterPositions() {
 function attack(attacker, defender, now) {
   if (!attacker.alive || !defender.alive) return;
 
-  const critChance = 0.07 + attacker.chaos * 0.012;
+  // ── DODGE / BLOCK CHECK ──
+  // Agility-based dodge chance (5-18%)
+  const dodgeChance = 0.03 + defender.agility * 0.015;
+  const isDodge = Math.random() < dodgeChance;
+  if (isDodge) {
+    const angle = Math.atan2(defender.y - attacker.y, defender.x - attacker.x);
+    attacker.cooldown = Math.max(0.15, 0.55 - attacker.agility * 0.03 + Math.random() * 0.12);
+    attacker.attackPulse = 0.6;
+
+    // Show "MISS" text
+    defender.dmgNumbers = defender.dmgNumbers || [];
+    const missText = new PIXI.Text("MISS", {
+      fontFamily: "Trebuchet MS, Arial",
+      fontSize: 12,
+      fontWeight: "900",
+      fill: 0xaaaaaa,
+      stroke: 0x000000,
+      strokeThickness: 2,
+      align: "center",
+    });
+    missText.anchor.set(0.5);
+    missText.position.set(randomRange(-8, 8), -35);
+    missText._dmgLife = 0.7;
+    missText._dmgVelX = randomRange(-0.3, 0.3);
+    missText._dmgVelY = -2.0;
+    defender.container.addChild(missText);
+    defender.dmgNumbers.push(missText);
+
+    // Dodge movement - defender sidesteps
+    const dodgeAngle = angle + (Math.random() > 0.5 ? Math.PI / 2 : -Math.PI / 2);
+    Matter.Body.setVelocity(defender.body, {
+      x: defender.body.velocity.x + Math.cos(dodgeAngle) * 3,
+      y: defender.body.velocity.y + Math.sin(dodgeAngle) * 2,
+    });
+    return;
+  }
+
+  // ── DAMAGE CALCULATION ──
+  // Base damage: weapon + power + randomness
+  const baseDamage = attacker.power * 0.8 + attacker.weapon.power * 0.7 + randomInt(2, 7);
+
+  // Damage variance: ±30% randomness for unpredictability
+  const variance = 0.7 + Math.random() * 0.6;
+
+  // Critical hit: higher chance with chaos stat
+  const critChance = 0.08 + attacker.chaos * 0.015;
   const isCrit = Math.random() < critChance;
-  const damage =
-    attacker.power * 1.65 +
-    attacker.weapon.power * 1.35 +
-    randomInt(4, 11) +
-    attacker.chaos * 0.45 +
-    (isCrit ? 12 : 0);
+  const critMultiplier = isCrit ? (1.8 + Math.random() * 0.7) : 1.0;
+
+  // Defender's toughness reduces damage (power acts as armor too)
+  const defenseReduction = 0.85 - defender.power * 0.02;
+
+  // Glancing blow chance: low damage hit (15% chance)
+  const isGlancing = !isCrit && Math.random() < 0.15;
+  const glancingMult = isGlancing ? 0.4 : 1.0;
+
+  // Final damage formula
+  let damage = baseDamage * variance * critMultiplier * defenseReduction * glancingMult;
+  damage = Math.max(2, Math.round(damage));
 
   const angle = Math.atan2(defender.y - attacker.y, defender.x - attacker.x);
-  attacker.cooldown = Math.max(0.12, 0.5 - attacker.agility * 0.03 + Math.random() * 0.12);
+  attacker.cooldown = Math.max(0.15, 0.55 - attacker.agility * 0.03 + Math.random() * 0.15);
   attacker.attackPulse = 1;
   defender.hitPulse = 1;
-  defender.wobble = 1;
-  defender.damageFlash = 1;
-  defender.hitStagger = 1;
+  defender.wobble = isGlancing ? 0.4 : 1;
+  defender.damageFlash = isGlancing ? 0.3 : 1;
+  defender.hitStagger = isGlancing ? 0.3 : 1;
   defender.hitWobbleTime = 0;
 
+  // Rage mechanic: damage slowly increases after 45s to prevent endless fights
+  const rageFactor = Math.max(1, 1 + ((state.battle.elapsed || 0) - 45) * 0.025);
+  const finalDamage = Math.round(damage * rageFactor);
+
   // Spawn damage number
-  const dmgRounded = Math.round(damage * Math.max(1, 1 + ((state.battle.elapsed || 0) - 30) * 0.05));
   defender.dmgNumbers = defender.dmgNumbers || [];
-  const dmgText = new PIXI.Text(dmgRounded.toString(), {
+  const dmgColor = isCrit ? 0xffcc00 : isGlancing ? 0x888888 : 0xff4444;
+  const dmgSize = isCrit ? 18 : isGlancing ? 10 : 14;
+  const dmgLabel = isGlancing ? finalDamage.toString() : finalDamage.toString();
+  const dmgText = new PIXI.Text(dmgLabel, {
     fontFamily: "Trebuchet MS, Arial",
-    fontSize: isCrit ? 18 : 14,
+    fontSize: dmgSize,
     fontWeight: "900",
-    fill: isCrit ? 0xffcc00 : 0xff4444,
+    fill: dmgColor,
     stroke: 0x000000,
     strokeThickness: 3,
     align: "center",
@@ -1822,13 +1879,13 @@ function attack(attacker, defender, now) {
   const attackerMass = attacker.archetype.mass || 1;
   const knockbackMultiplier = 1 / defenderMass;
 
-  const rageFactor = Math.max(1, 1 + ((state.battle.elapsed || 0) - 30) * 0.05);
-  defender.hp = Math.max(0, defender.hp - damage * rageFactor);
+  defender.hp = Math.max(0, defender.hp - finalDamage);
 
-  // Apply knockback via velocity change
+  // Apply knockback via velocity change (scaled to new damage range)
+  const kbForce = isCrit ? finalDamage * 0.35 : finalDamage * 0.2;
   Matter.Body.setVelocity(defender.body, {
-    x: defender.body.velocity.x + Math.cos(angle) * damage * 0.42 * knockbackMultiplier,
-    y: defender.body.velocity.y + Math.sin(angle) * damage * 0.32 * knockbackMultiplier,
+    x: defender.body.velocity.x + Math.cos(angle) * kbForce * knockbackMultiplier,
+    y: defender.body.velocity.y + Math.sin(angle) * kbForce * 0.75 * knockbackMultiplier,
   });
   clampVelocity(defender.body, 30);
   // Attacker recoil
@@ -1839,15 +1896,15 @@ function attack(attacker, defender, now) {
   clampVelocity(attacker.body, 30);
 
   // Trauma shake proportional to damage
-  state.camera.traumaShake = Math.min(1, state.camera.traumaShake + damage / 80);
-  state.arena.intensity = Math.min(1, state.arena.intensity + damage / 115);
+  state.camera.traumaShake = Math.min(1, state.camera.traumaShake + finalDamage / 50);
+  state.arena.intensity = Math.min(1, state.arena.intensity + finalDamage / 80);
 
   // Blood particles + impact
   spawnImpact(defender.x, defender.y, attacker.visual.hat, isCrit);
   spawnBlood(defender.x, defender.y, angle, damage, isCrit);
 
   // Blood decal on arena floor
-  if (damage > 15 || isCrit) {
+  if (finalDamage > 8 || isCrit) {
     state.decals.push({
       x: defender.x + Math.cos(angle) * randomRange(5, 20),
       y: defender.y + Math.sin(angle) * randomRange(5, 20),
@@ -1908,7 +1965,7 @@ function attack(attacker, defender, now) {
   clampVelocity(defender.body, 35);
 
   attacker.eliminations += 1;
-  attacker.hp = Math.min(attacker.maxHp, attacker.hp + 7 + attacker.eliminations * 0.8);
+  attacker.hp = Math.min(attacker.maxHp, attacker.hp + 20 + attacker.eliminations * 3);
   state.arena.knockedOut += 1;
   state.arena.intensity = Math.min(1, state.arena.intensity + 0.25);
 
@@ -3159,7 +3216,7 @@ function getProfile(participant) {
     power,
     agility,
     chaos,
-    maxHp: 72 + power * 4 + agility * 2,
+    maxHp: 150 + power * 8 + agility * 4,
     reach: weapon.reach,
     visual: {
       skin: seededPick(rng, SKIN_TONES),
