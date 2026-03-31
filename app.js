@@ -2044,7 +2044,7 @@ function attack(attacker, defender, now) {
 
   // ── DAMAGE CALCULATION ──
   // Base damage: weapon + randomness
-  const baseDamage = attacker.weapon.power * 0.9 + randomInt(3, 9);
+  const baseDamage = attacker.weapon.power * 1.2 + randomInt(5, 12);
 
   // Damage variance: ±35% randomness
   const variance = 0.65 + Math.random() * 0.7;
@@ -2074,7 +2074,7 @@ function attack(attacker, defender, now) {
   const elapsed = state.battle.elapsed || 0;
   const aliveCount = state.fighters.filter(f => f.alive).length;
   // Base rage ramps after 30s; final duel gets extra 50% rage
-  let rageFactor = Math.max(1, 1 + (elapsed - 30) * 0.04);
+  let rageFactor = Math.max(1, 1 + (elapsed - 25) * 0.05);
   if (aliveCount <= 2) rageFactor *= 1.5;
   const finalDamage = Math.round(damage * rageFactor);
 
