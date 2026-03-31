@@ -276,6 +276,12 @@ textarea {
     background var(--transition);
 }
 
+textarea {
+  resize: vertical;
+  min-height: 120px;
+  border-bottom-right-radius: 6px;
+}
+
 input:focus,
 textarea:focus {
   transform: translateY(-1px);
