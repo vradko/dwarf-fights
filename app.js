@@ -1224,6 +1224,10 @@ function handleResize() {
 
 async function init() {
   state.welcome = pick(WELCOME_MESSAGES);
+  // Auto-populate with sample names on first visit
+  if (state.participants.length === 0) {
+    addNames(SAMPLE_NAMES.join(", "));
+  }
   saveRoster();
   createKillFeedElement();
   bindEvents();
