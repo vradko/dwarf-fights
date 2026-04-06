@@ -1434,8 +1434,28 @@ function bindEvents() {
 
   dom.addForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    addNames(dom.nameInput.value);
-    dom.nameInput.value = "";
+    // Replace entire roster with textarea contents
+    const names = parseNames(dom.nameInput.value);
+    if (names.length === 0) return;
+    // Keep existing participants that match, add new ones
+    const oldMap = new Map(state.participants.map(p => [p.name.toLowerCase(), p]));
+    const seen = new Set();
+    const updated = [];
+    names.forEach(name => {
+      const key = name.toLowerCase();
+      if (seen.has(key) || updated.length >= MAX_PARTICIPANTS) return;
+      seen.add(key);
+      if (oldMap.has(key)) {
+        updated.push(oldMap.get(key)); // keep existing seed/id
+      } else {
+        updated.push({ id: createId(), name, seed: createSeed() });
+      }
+    });
+    state.participants = updated;
+    PROFILE_CACHE.clear();
+    saveRoster();
+    renderRoster();
+    renderControls();
     dom.nameInput.focus();
   });
 
@@ -3244,6 +3264,9 @@ function renderRoster() {
       `;
     })
     .join("");
+
+  // Keep textarea in sync with current roster names
+  dom.nameInput.value = state.participants.map(p => p.name).join('\n');
 }
 
 function renderChampion() {
