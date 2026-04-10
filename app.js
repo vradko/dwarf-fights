@@ -4,12 +4,12 @@ const MAX_PARTICIPANTS = 50;
 const STORAGE_ROSTER = "dwarf-fights-roster-v2";
 const STORAGE_CHAMPION = "dwarf-fights-champion-v2";
 
-const WORLD_WIDTH = 1000;
-const WORLD_HEIGHT = 620;
+const WORLD_WIDTH = 1200;
+const WORLD_HEIGHT = 780;
 const CENTER_X = WORLD_WIDTH / 2;
 const CENTER_Y = WORLD_HEIGHT * 0.56;
-const ARENA_RX = 300;
-const ARENA_RY = 176;
+const ARENA_RX = 370;
+const ARENA_RY = 220;
 const PROFILE_CACHE = new Map();
 
 // ── TRASH FACTS ──────────────────────────────────────────
@@ -438,6 +438,7 @@ const dom = {
   intensityFill: document.querySelector("#intensityFill"),
   intensityValue: document.querySelector("#intensityValue"),
   eventLog: document.querySelector("#eventLog"),
+  copyLogBtn: document.querySelector("#copyLogBtn"),
   championEmptyState: document.querySelector("#championEmptyState"),
   championCard: document.querySelector("#championCard"),
   victoryOverlay: document.querySelector("#victoryOverlay"),
@@ -869,8 +870,8 @@ function drawOctagon() {
   const isoCY = isoY(CENTER_Y);
 
   // Court dimensions (rectangular, isometric)
-  const courtHalfW = 230;
-  const courtHalfH = 230;
+  const courtHalfW = 290;
+  const courtHalfH = 290;
   const courtCorners = [
     { x: CENTER_X - courtHalfW, y: isoCY - courtHalfH * ISO_SCALE },
     { x: CENTER_X + courtHalfW, y: isoCY - courtHalfH * ISO_SCALE },
@@ -1459,7 +1460,13 @@ function bindEvents() {
     dom.nameInput.focus();
   });
 
-  // bulkAddBtn removed - textarea handles both single and bulk input
+  dom.copyLogBtn.addEventListener("click", () => {
+    const logText = dom.eventLog.innerText || dom.eventLog.textContent || '';
+    navigator.clipboard.writeText(logText).then(() => {
+      dom.copyLogBtn.textContent = 'Copied!';
+      setTimeout(() => { dom.copyLogBtn.textContent = 'Copy log'; }, 2000);
+    });
+  });
 
   dom.seedNamesBtn.addEventListener("click", () => {
     addNames(SAMPLE_NAMES.join(", "));
@@ -1971,8 +1978,8 @@ function clampVelocity(body, maxSpeed) {
 }
 
 function syncFighterPositions() {
-  const ARENA_R = 195; // more conservative: well inside WALL_R (220)
-  const HARD_LIMIT = 220; // absolute safety: WALL_R
+  const ARENA_R = 250; // more conservative: well inside WALL_R
+  const HARD_LIMIT = 280; // absolute safety
   for (const fighter of state.fighters) {
     fighter.x = fighter.body.position.x;
     fighter.y = fighter.body.position.y;
@@ -2563,7 +2570,7 @@ function drawFighterPixi(fighter, time, showLabel, isLeader) {
 
   // Perspective scaling — sprite is upper body only, smaller scale
   const perspScale = 0.88 + (fighter.y - (CENTER_Y - 220)) / 440 * 0.24;
-  const baseScale = 0.42 * perspScale;
+  const baseScale = 0.55 * perspScale;
 
   // Direction — never flip the container, only flip individual elements
   const flipX = fighter.facingRight ? 1 : -1;
